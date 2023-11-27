@@ -1,0 +1,42 @@
+# exe 파일 제외
+*.exe
+#C++ 프로젝트 ignore 목록
+# Ignore build output
+[Oo]bj/
+[Bb]in/
+[Dd]ebug*/
+[Rr]elease*/
+x64/
+x86/
+
+# Ignore Visual Studio temporary files, build results, and other .NET specific files
+*.suo
+*.sln.docstates
+*.sln.ide/
+*.user
+*.userosscache
+*.sdf
+*.dbmdl
+*.vcxproj
+*.vcxproj.user
+*.vcxproj.filters
+*.jfm
+*.VC.db
+*.VC.VC.opendb
+*.ipch
+*.log
+*.bak
+*.swp
+*.swo
+*.unsuccessful
+*.bak
+*.accd*
+*.db
+*.db-shm
+*.db-wal
+*.bak
+*.swp
+*.swo
+*.unsuccessful
+.vs/
+*.sln
