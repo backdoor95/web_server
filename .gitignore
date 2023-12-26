@@ -1,3 +1,33 @@
+# Ignore all
+*
+
+# Unignore all with extensions
+!*.*
+
+# Unignore all dirs
+!*/
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Executables
+*.exe
+*.out
+*.app
+
+
 # exe 파일 제외
 *.exe
 #C++ 프로젝트 ignore 목록
@@ -40,3 +70,4 @@ x86/
 *.unsuccessful
 .vs/
 *.sln
+
