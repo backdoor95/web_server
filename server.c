@@ -14,6 +14,11 @@
 
 int sockfd, new_fd;
 
+void signIntHandler(int sig_num){
+    printf("/n Ctrl+C 입력으로 서버를 종료합니다.\n");
+    close(sockfd);
+    exit(EXIT_SUCCESS);
+}
 
 int main()
 {
@@ -22,10 +27,16 @@ int main()
     struct sockaddr_in their_addr; // 상대 주소
     int sin_size;
 
+// ctrl + c를 눌러스 프로세스를 종료 -> 그러나 프로세스는 종료되지만 종료된 프로세스에서 바인딩한  "port"는 한동안 release 되지 않고
+// OS가 들고 있는다. 그래서서 똑같은 port를 쓰려면 문제가 발생
+// 따라서 signal를 사용하여, ctrl + c를 눌렀을때, 프로세스가 종료되면서 관련된 socket 자료구조들이 release하게 한다.
+    signal(SIGINT, signIntHandler);
+    // signal(SIGTERM, signIntHandler) 와 차이가 있다. 3장 - 26page 참고
+
     if ((sockfd = socket(PF_INET, SOCK_STREAM, 0)) == -1)
     {
         perror("socket error");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     my_addr.sin_family = AF_INET;
@@ -35,13 +46,13 @@ int main()
     if (bind(sockfd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr)) == -1)
     {
         perror("bind error");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     if (listen(sockfd, BACKLOG) == -1)
     {
         perror("listen error");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     while (1)
