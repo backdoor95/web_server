@@ -77,14 +77,29 @@ int main()
             char *requested_file = strtok(request, " ");
             requested_file = strtok(NULL, " "); // 요청된 파일명
 
-            // 요청된 파일이 "/index.html"인지 확인하고 해당 파일 로드
-            if (strcmp(requested_file, "/index.html") == 0)
+            // 요청된 파일명이 '/'인 경우 기본 파일을 'index.html'로 설정
+            if (strcmp(requested_file, "/") == 0)
             {
+                requested_file = "/index.html";
+            }
+
+            // '/' 제거
+            if (requested_file[0] == '/')
+            {
+                requested_file++; // '/' 제거
+            }
+
+            // Content-Type 설정을 위한 확장자 추출
+            char *file_extension = strrchr(requested_file, '.');
+            if (file_extension != NULL)
+            {
+                file_extension++; // '.' 제거
+
                 FILE *file_ptr;
                 char file_buffer[1024];
                 memset(file_buffer, 0, sizeof(file_buffer));
-
-                if ((file_ptr = fopen("index.html", "r")) == NULL)
+                printf("파일 이름 : %s", requested_file);
+                if ((file_ptr = fopen(requested_file, "r")) == NULL)
                 {
                     printf("File not found\n");
                     // 파일을 찾을 수 없는 경우 404 응답 전송
@@ -96,9 +111,36 @@ int main()
                     fread(file_buffer, sizeof(char), sizeof(file_buffer), file_ptr);
                     fclose(file_ptr);
 
+                    // Content-Type 설정
+                    char content_type[50];
+                    if (strcmp(file_extension, "html") == 0)
+                    {
+                        strcpy(content_type, "text/html");
+                    }
+                    else if (strcmp(file_extension, "txt") == 0)
+                    {
+                        strcpy(content_type, "text/plain");
+                    }
+                    else if (strcmp(file_extension, "gif") == 0)
+                    {
+                        strcpy(content_type, "image/gif");
+                    }
+                    else if (strcmp(file_extension, "jpg") == 0 || strcmp(file_extension, "jpeg") == 0)
+                    {
+                        strcpy(content_type, "image/jpeg");
+                    }
+                    else if (strcmp(file_extension, "mp3") == 0)
+                    {
+                        strcpy(content_type, "audio/mpeg");
+                    }
+                    else
+                    {
+                        strcpy(content_type, "text/plain"); // 알 수 없는 확장자의 경우 기본값으로 설정
+                    }
+
                     // HTTP 응답 생성 - 요청된 파일을 포함한 HTTP 응답 생성
                     char http_response[2048];
-                    sprintf(http_response, "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n%s", file_buffer);
+                    sprintf(http_response, "HTTP/1.1 200 OK\r\nContent-Type: %s\r\n\r\n%s", content_type, file_buffer);
 
                     // 클라이언트에게 응답 보내기
                     send(new_fd, http_response, strlen(http_response), 0);
@@ -106,7 +148,7 @@ int main()
             }
             else
             {
-                // 다른 파일을 요청한 경우 404 응답 전송
+                // 확장자가 없는 경우 404 응답 전송
                 char http_404_response[] = "HTTP/1.1 404 Not Found\r\nContent-Type: text/html\r\n\r\n<h1>404 Not Found</h1>";
                 send(new_fd, http_404_response, strlen(http_404_response), 0);
             }
